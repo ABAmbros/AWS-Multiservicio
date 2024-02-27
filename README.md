@@ -1,6 +1,6 @@
 # PROYECTO EN AWS. THE BRIDGE. BOOTCAMP CLOUD & DEVOPS
 
-![Principal AWS](https://uca3c83e5adb0d0fcb9b2a2384c7.previews.dropboxusercontent.com/p/thumb/ACAz-K_YvLeIM6tMqU7cp8PKJU2mbNjBTDG6OEnxmlimUQHpEBCcoDF8xPCtqaPDVNtZkWj8EC97ArLTPWJclVkq0VnQnPJX5flb1dmRMuZkcVIc_02qN5E4qrdK9dBbwYRmxo8yWjUjtd32mK5ENfd6RxhqAw5SWPYZ39OJjFZ8a-oUB_xFqr2dpA-O-Iv5_D-vZxnRZBzpr_Xb5jfTrAC8n4LCROAWoLF_0LUsCftrZKvTSHRaiiodVNVmNBfs733sbucBsPtGmkWJu-KSbxd7umFU04xKvznwvgyH5OBYn0mX3mYX2lcBUHoMin-eiCn-RHW6MUZeuKnRFVkDPPOyFs0X_LkBX41R2_zrMKkWz7syViwUvscJyRSIfY_1quI/p.png)
+![Alt text](img/aws.jpeg)
 
 ## Descripción
 Este proyecto tiene como objetivo la realización de una serie de ejercicios prácticos en AWS como parte del Bootcamp Cloud & DevOps impartido por The Bridge. A lo largo de este README, encontrarás instrucciones detalladas, ejemplos de código y capturas de pantalla que te guiarán en la implementación de las tareas asignadas. El proyecto aborda diversos aspectos de AWS, incluyendo el despliegue de servicios en la nube, la automatización de tareas y la gestión de recursos.
@@ -145,8 +145,6 @@ def lambda_handler(event, _):
 Con este código, la función Lambda recopila los JSONs del bucket de S3, los procesa y los almacena en la tabla DynamoDB. La configuración del disparador de S3 garantiza que la función se ejecute automáticamente cuando se agregan nuevos archivos al bucket.
 
 
-
-![SERVICIOS](https://uc8b4d3e7408ee53392ea994f704.previews.dropboxusercontent.com/p/thumb/ACC-kp7uGWEyUBPgmmIuh494xw1McMehQKXbQa1J5PpnDeWDsjF4wZMgfNw07GcGsszF5Fqvdz0HjySOloWEdZhchxQVxerh6kH3eAOvknRLNiYIVS9fmCP0GAH4AI4TrmqwHggF7q1e70I-BPqZ68aikQksTmlJSvYxZeSWmoanqg8HgwDdrsSWVHUGgORunm7II6Aqmo8zLDFJD6H5Ql2fZkw4pqIWtFP_HPGtAF8iEtT-Z0vxWypFSVeH_66LNnI0GCaeiIiLnEBowZtmLBMwM_kY9KTmpvGKvEtSmdAis275K3yQ6uL9dEYaL0jV5cMYs5XTNewlXKhGgqA6_PjbKZKzULhjVRfg-ZvFwXJYaucQfY-z2wCWy9jyZVs-Q8Q/p.png)
 
 
 ### Ejercicio 2
