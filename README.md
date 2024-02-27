@@ -144,7 +144,7 @@ def lambda_handler(event, _):
 
 Con este código, la función Lambda recopila los JSONs del bucket de S3, los procesa y los almacena en la tabla DynamoDB. La configuración del disparador de S3 garantiza que la función se ejecute automáticamente cuando se agregan nuevos archivos al bucket.
 
-
+![Alt text](img/AWS_SERVICES.jpeg)
 
 
 ### Ejercicio 2
@@ -667,10 +667,10 @@ if __name__ == '__main__':
 
 Finalmente, la estética y el CSS de esta web se gestiona íntegramente por la libreria `Bootstrap`, que es gratuíta y se encuentra en la web `https://getbootstrap.com/`
 
-![AWS CLI](https://uc1580bdb0faabc98b2b50e82767.previews.dropboxusercontent.com/p/thumb/ACDqjabgFxIJ_KU7WutA0_bYAeyUygaRYWMvsQazNHKe-qBbY9lcD2YsaJUsSU3mFm50kEN22XvZmfYYp5fMToVRFHG3Dg93Y25a7qOl9Q7DpHblMe_3Ll9ez3I1lSBa5zloctlfZQAdr9CVO5Uu8ClSgJYiod1oWQDsp1ciOmYJqPG5saRCq_dVjyVDQ3wB3IjGwPf6H5UWYuRuTfnTYSDl0O0qKnYxhxBPMsYqhio-B8kmQZrsmD82iyYIxiHs8oQrIX3D6zSArbq4d6Oln4yLvWUvCvFilWkPCMhaQhIx4ATiQx6Okqm37Cmh05UnpyNYXUruknUM23N3x3loVNUkcagmXGjIqoFibW2iBq4ywcAxcRtixGH65gBiGpihRvU/p.png)
-
 
 # Ejercicio AWS CLI
+
+![Alt text](img/aws_CLI_2.png)
 
 En este ejercicio intentarémos lanzar todas los servicios de AWS, que hemos creado manualmente a través de la interfaz web, utilizando un script de bash que contendrá todos los comandos de la AWS Command Line Interface (AWS CLI) necesarios. Esto nos permitirá lograr exactamente lo mismo que hicimos interactuando con AWS a través de la página web, pero de una manera automatizada y mediante la línea de comandos.
 
