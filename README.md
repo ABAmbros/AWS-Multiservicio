@@ -685,23 +685,105 @@ El script de bash resultante servirá como una representación de la infraestruc
 
 A continuación, se muestra el script de bash que utiliza la AWS Command Line Interface (AWS CLI) para crear varios recursos en AWS, incluyendo un bucket S3, una tabla de DynamoDB, roles de ejecución, una función Lambda y una instancia EC2. 
 
-**Por desgracia, para esta presentación, este ejercicio ha quedado incompleto. Vamos a verlo:**
+## Resumen:
+
+### Configurar AWS en la máquina
+
 ```bash
-#! /bin/bash
+aws configure
+```
+Esto te pedirá que ingreses la información de tus credenciales de AWS:
 
-# Crear Bucket de S3
-aws s3 mb s3://antoniojuan-storage --region eu-west-3
+- AWS Access Key ID: Tu clave de acceso de AWS.
+- AWS Secret Access Key: Tu clave secreta de acceso de AWS.
+- Default region name: La región de AWS que deseas utilizar (por ejemplo, us-east-1).
 
-# Crear tabloa de dynamoDB
+## Creación EC2
+
+```bash
+aws ec2 run-instances \
+    --image-id AMI_ID \
+    --instance-type INSTANCE_TYPE \
+    --key-name KEY_PAIR_NAME \
+    --subnet-id SUBNET_ID \
+    --security-group-ids SECURITY_GROUP_ID \
+    --region YOUR_REGION
+```
+## Creación S3
+
+```bash
+aws s3 api create-bucket --bucket NOMBRE_DEL_CUBO --region REGION
+```
+
+Podrías tener problemas con tu región, por lo cual es recomendable usar una variable de entorno:
+
+```bash
+export NOMBRE_DE_VARIABLE=valor
+```
+
+Para establecerla de manera permanente, generalmente se agrega esa línea al archivo de perfil del usuario, como ~/.bashrc o ~/.bash_profile. Puedes editar estos archivos con un editor de texto como nano o vim.
+
+```bash
+echo 'export NOMBRE_DE_VARIABLE=valor' >> ~/.bashrc
+source ~/.bashrc
+```
+## Creamos una base de datos en DynamoDB y una función Lambda
+
+### Paso 1: Crear una tabla en DynamoDB
+
+```bash
 aws dynamodb create-table \
-    --table-name antoniojuan-database \
-    --region eu-west-3 \
-    --attribute-definitions AttributeName=ID,AttributeType=N \
+    --table-name Usuarios \
+    --attribute-definitions \
+        AttributeName=ID,AttributeType=N \
     --key-schema AttributeName=ID,KeyType=HASH \
-    --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+    --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+    --region tu-region
+```
+### Subir el código a un Bucket de S3
 
+Antes de ejecutar el comando para crear la función Lambda, necesitaremos tener el código de la función en un archivo ZIP y almacenarlo en un bucket de S3.
 
-# Crear rol de ejecución dynamoDBallowall y S3readonly
+```bash
+aws s3 cp tu-archivo-.zip s3://tu-cubo/
+```
+
+### Paso 2: Crear una función Lambda
+
+```bash
+aws lambda create-function \
+    --function-name GuardarUsuarioEnDynamoDB \
+    --runtime python3.8 \
+    --role arn:aws:iam::tu-id-de-cuenta:role/el-rol \
+    --handler guardar_usuario.handler \
+    --code S3Bucket=tu-bucket-con-el-codigo,Key=tu-archivo-zip-con-el-codigo.zip \
+    --environment Variables={DYNAMODB_TABLE=Usuarios} \
+    --region tu-region
+```
+
+### Paso 3: Crear una función Lambda que se active al crear un objeto en S3
+
+```bash
+aws lambda create-function \
+    --function-name TriggerLambda \
+    --runtime python3.8 \
+    --role arn:aws:iam::tu-id-de-cuenta:role/tu-rol \
+    --handler trigger_lambda.handler \
+    --code S3Bucket=tu-bucket-con-el-codigo,Key=tu-archivo-zip-con-el-codigo.zip \
+    --environment Variables={TARGET_LAMBDA_NAME=GuardarUsuarioEnDynamoDB} \
+    --region tu-region
+```
+### Paso 4: Configurar el trigger de S3 para activar la función Lambda
+
+```bash
+aws s3api put-bucket-notification-configuration \
+    --bucket tu-bucket-s3 \
+    --notification-configuration '{"LambdaFunctionConfigurations":[{"LambdaFunctionArn":"arn:aws:lambda:tu-region:tu-id-de-cuenta:function:TriggerLambda","Events":["s3:ObjectCreated:*"]}]}'
+```
+
+## Roles y políticas
+
+### Crear rol de ejecución dynamoDBallowall y S3readonly
 aws iam create-role \
     --role-name forlambda-dynamodballowall-s3readonly \
     --region eu-west-3 \
@@ -718,7 +800,7 @@ aws iam create-role \
     ]
 }'
 
-# Agregar políticas de permisos al rol creado
+### Agregar políticas de permisos al rol creado
 aws iam attach-role-policy \
     --role-name forlambda-dynamodballowall-s3readonly \
     --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
@@ -727,48 +809,8 @@ aws iam attach-role-policy \
     --role-name forlambda-dynamodballowall-s3readonly \
     --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
 
-# Crear lambda
-aws lambda create-function \
-    --function-name antoniojuan-funcionS3aDB \
-    --zip-file fileb://funcionS3aDB.zip \
-    --handler index.handler \
-    --runtime python3.11 \
-    --role $(aws iam get-role --role-name forlambda-dynamodballowall-s3readonly --query 'Role.Arn' --output text)  > output.txt
 
-# Agregar trigger a la lambda    NO FUNCIONA!!!
-aws lambda add-permission \
-    --function-name antoniojuan-funcionS3aDB \
-    --principal s3.amazonaws.com \
-    --statement-id S3InvokePermission1 \
-    --action lambda:InvokeFunction \
-    --source-arn arn:aws:s3:::antoniojuan-storage \
-    --source-account $(aws sts get-caller-identity --query Account --output text)
-
-
-aws s3api put-bucket-notification-configuration \
-    --region eu-west-3 \
-    --bucket antoniojuan-database \
-    --notification-configuration '{
-    "LambdaFunctionConfigurations": [
-        {
-            "LambdaFunctionArn": $(aws lambda get-function --function-name antoniojuan-funcionS3aDB --query 'Configuration.FunctionArn' --output text),
-            "Events": ["s3:ObjectCreated:*"],
-            "Filter": {
-                "Key": {
-                    "FilterRules": [
-                        {
-                            "Name": "suffix",
-                            "Value": ".json"
-                        }
-                    ]
-                }
-            }
-        }
-    ]
-}'
-
-
-# Crear rol de ejecución dynamoDBreadonly y S3fullaccess
+### Crear rol de ejecución dynamoDBreadonly y S3fullaccess
 aws iam create-role \
     --role-name EC2-readdynamoDB-fullaccessS3 \
     --assume-role-policy-document '{
@@ -786,7 +828,7 @@ aws iam create-role \
 
 arn_rol_ec2=$(aws iam get-role --role-name forlambda-dynamodballowall-s3readonly --query 'Role.Arn' --output text)
 
-# Agregar políticas de permisos al rol creado
+### Agregar políticas de permisos al rol creado
 aws iam attach-role-policy \
     --role-name EC2-readdynamoDB-fullaccessS3 \
     --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
@@ -794,15 +836,3 @@ aws iam attach-role-policy \
 aws iam attach-role-policy \
     --role-name EC2-readdynamoDB-fullaccessS3 \
     --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess
-
-# Crear perfil de seguridad para HTTP, HTTPS, SSH y TCP personalizado a través del puerto 8080
-# POR HACER!!!
-
-# Crear instancia    INCOMPLETO!!!
-aws ec2 run-instances \
-    --image-id ami-00983e8a26e4c9bd9 \
-    --count 1 \
-    --instance-type t2.micro \
-    --key-name ficheroclaves \
-    --iam-instance-profile Name=EC2-read-dynamoDB-fullaccess-S3     # AQUI HAY TRAMPA!!!
-```
