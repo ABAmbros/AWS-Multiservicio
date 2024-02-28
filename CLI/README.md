@@ -112,6 +112,7 @@ aws s3api put-bucket-notification-configuration \
 ## Roles y políticas
 
 ### Crear rol de ejecución dynamoDBallowall y S3readonly
+```bash
 aws iam create-role \
     --role-name forlambda-dynamodballowall-s3readonly \
     --region eu-west-3 \
@@ -127,18 +128,25 @@ aws iam create-role \
         }
     ]
 }'
+```
+
 
 ### Agregar políticas de permisos al rol creado
+```bash
 aws iam attach-role-policy \
     --role-name forlambda-dynamodballowall-s3readonly \
     --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess
+```
 
+```bash
 aws iam attach-role-policy \
     --role-name forlambda-dynamodballowall-s3readonly \
     --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
-
+```
 
 ### Crear rol de ejecución dynamoDBreadonly y S3fullaccess
+
+```bash
 aws iam create-role \
     --role-name EC2-readdynamoDB-fullaccessS3 \
     --assume-role-policy-document '{
@@ -153,14 +161,22 @@ aws iam create-role \
         }
     ]
 }'
+```
 
+
+```bash
 arn_rol_ec2=$(aws iam get-role --role-name forlambda-dynamodballowall-s3readonly --query 'Role.Arn' --output text)
+```
 
 ### Agregar políticas de permisos al rol creado
+```bash
 aws iam attach-role-policy \
     --role-name EC2-readdynamoDB-fullaccessS3 \
     --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess
+```
 
+```bash
 aws iam attach-role-policy \
     --role-name EC2-readdynamoDB-fullaccessS3 \
     --policy-arn arn:aws:iam::aws:policy/AmazonDynamoDBReadOnlyAccess
+```
